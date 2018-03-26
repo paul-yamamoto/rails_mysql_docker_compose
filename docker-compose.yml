@@ -1,0 +1,30 @@
+version: '2'
+
+services:
+  storage:
+    image: busybox
+    volumes:
+      - /var/lib/mysql
+      - /root/gems
+  db:
+    image: mysql
+    environment:
+      - MYSQL_ALLOW_EMPTY_PASSWORD=true
+    volumes_from:
+      - storage
+    ports:
+      - "3306:3306"
+  rails:
+    build:
+      context: ./hello_app
+    environment:
+      - RAILS_ENV=development
+    command: ./start.sh
+    volumes:
+      - ./hello_app:/root/hello_app
+    volumes_from:
+      - storage
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
